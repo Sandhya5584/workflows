@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Build & Deploy
 
 on:
   push:
@@ -17,13 +17,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
         with:
-          node-version: '3.11'
+          node-version: 16
 
       - name: Install dependencies
-        uses: pip install -r "C:\Users\nuaga\OneDrive\Desktop\workflows\requirements.txt"
+        uses: bahmutov/npm-install@v1
 
       - name: Build project
         run: npm run build
