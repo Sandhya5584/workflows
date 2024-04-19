@@ -4,34 +4,51 @@ on:
   push:
     branches:
       - main
+      
+env:
+  CI: false
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11'
+          node-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        uses: pip install -r "C:\Users\nuaga\OneDrive\Desktop\workflows\requirements.txt"
 
-      - name: Run tests
-        run: python -m unittest discover -s tests
+      - name: Build project
+        run: npm run build
+
+      - name: Upload production-ready build files
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-files
+          path: ./build
 
   deploy:
+    name: Deploy
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
     steps:
-    - name: Deploy to Heroku
-      run: |
-        # Use secrets for sensitive information
-        echo "Deploying application to Heroku..."
-        heroku login -i <<EOF
-        ${{ secrets.HEROKU_API_KEY }}
-        EOF
-        git push heroku main
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: production-files
+          path: ./build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          publish_dir: ./build
