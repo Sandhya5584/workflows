@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -27,8 +27,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Heroku
-        run: |
-          # Replace these with your actual Heroku deployment steps
-          echo "Deploying application to Heroku..."
-          # Add your Heroku deployment commands here (e.g., heroku login, git push heroku main, etc.)
+    - name: Deploy to Heroku
+      run: |
+        # Use secrets for sensitive information
+        echo "Deploying application to Heroku..."
+        heroku login -i <<EOF
+        ${{ secrets.HEROKU_API_KEY }}
+        EOF
+        git push heroku main
